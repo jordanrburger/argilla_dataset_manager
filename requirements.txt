@@ -1,0 +1,4 @@
+argilla
+pandas
+python-dotenv
+requests

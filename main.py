@@ -8,7 +8,7 @@ from utils.argilla_client import (
     get_or_create_dataset,
     log_records_to_dataset,
 )
-from datasets.dataset_settings import get_dataset_settings
+from my_datasets.dataset_settings import get_dataset_settings
 import argilla as rg
 
 def main():

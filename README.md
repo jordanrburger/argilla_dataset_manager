@@ -1,14 +1,14 @@
 # Argilla Dataset Manager
 
-A Python-based tool for managing and uploading datasets to Argilla, specifically designed for handling Q&A data from various sources like Confluence and Slack.
+A Python-based tool for managing and uploading datasets to Argilla, specifically designed for handling various types of text datasets with advanced configuration options.
 
 ## Features
 
-- Load and process CSV files containing Q&A data
-- Configurable data processing and transformation
-- Automated dataset creation and management in Argilla
-- Robust logging system
-- Support for custom metadata and field mapping
+- Easy dataset creation with predefined templates
+- Flexible dataset configuration for different use cases
+- Dataset migration and versioning
+- Workspace management
+- Robust error handling and logging
 
 ## Prerequisites
 
@@ -35,59 +35,151 @@ ARGILLA_API_URL=your_argilla_api_url
 ARGILLA_API_KEY=your_api_key
 ```
 
+## Quick Start
+
+### 1. Create a Text Classification Dataset
+
+```python
+from utils import DatasetManager, get_argilla_client
+from datasets import SettingsManager
+
+# Initialize
+client = get_argilla_client()
+dataset_manager = DatasetManager(client)
+settings_manager = SettingsManager()
+
+# Create settings for text classification
+settings = settings_manager.create_text_classification(
+    labels=['positive', 'negative', 'neutral'],
+    guidelines="Sentiment analysis dataset",
+    include_metadata=True,
+    metadata_fields=['source', 'confidence']
+)
+
+# Create dataset
+dataset = dataset_manager.create_dataset(
+    workspace="my_workspace",
+    dataset="sentiment_analysis",
+    settings=settings
+)
+
+# Add records
+record = rg.Record(
+    fields={
+        "text": "This product is amazing!"
+    },
+    metadata={
+        "source": "reviews",
+        "confidence": 0.95
+    }
+)
+dataset.records.log([record])
+```
+
+### 2. Create a Q&A Dataset
+
+```python
+# Create settings for Q&A dataset
+settings = settings_manager.create_qa_dataset(
+    include_context=True,
+    include_keywords=True,
+    include_references=True,
+    guidelines="Customer support Q&A dataset"
+)
+
+# Create dataset
+dataset = dataset_manager.create_dataset(
+    workspace="support_workspace",
+    dataset="customer_qa",
+    settings=settings
+)
+
+# Add a Q&A record
+record = rg.Record(
+    fields={
+        "question": "How do I reset my password?",
+        "answer": "Click on 'Forgot Password' and follow the instructions.",
+        "context": "User authentication flow",
+        "keywords": "password,reset,auth",
+        "references": "docs/auth.md"
+    },
+    metadata={
+        "source": "support_tickets",
+        "date": "2023-12-01"
+    }
+)
+dataset.records.log([record])
+```
+
+### 3. Dataset Migration and Versioning
+
+```python
+# Create new version of existing dataset with updated settings
+new_version = dataset_manager.update_dataset_settings(
+    workspace="my_workspace",
+    dataset="customer_qa",
+    new_settings=updated_settings,
+    create_new_version=True
+)
+
+# Clone dataset to different workspace
+cloned_dataset = dataset_manager.clone_dataset(
+    workspace="development",
+    dataset="customer_qa",
+    new_name="customer_qa_prod",
+    new_workspace="production"
+)
+```
+
+## Available Dataset Templates
+
+The `SettingsManager` provides several predefined templates:
+
+1. **Text Classification**
+   - Basic text classification with customizable labels
+   - Optional metadata fields
+
+2. **Q&A Datasets**
+   - Question and answer fields
+   - Optional context, keywords, and references
+   - Configurable metadata
+
+3. **Text Generation**
+   - Prompt and response fields
+   - Optional prompt templates
+   - Model-specific metadata
+
+4. **Text Summarization**
+   - Text and summary fields
+   - Length and compression ratio tracking
+   - Source tracking
+
+5. **Custom Datasets**
+   - Create datasets with custom fields
+   - Flexible metadata configuration
+
 ## Project Structure
 
 ```
 ├── main.py                 # Main application entry point
 ├── config.py              # Configuration settings
 ├── utils/
-│   ├── argilla_client.py  # Argilla API interaction functions
+│   ├── argilla_client.py  # Argilla API interaction
+│   ├── dataset_manager.py # Dataset management
 │   ├── data_loader.py     # Data loading utilities
-│   ├── data_processor.py  # Data processing functions
 │   └── logger.py          # Logging configuration
 ├── datasets/
-│   └── dataset_settings.py # Dataset field configurations
-└── requirements.txt       # Project dependencies
+│   └── settings_manager.py # Dataset settings and templates
+└── examples/              # Usage examples and tutorials
 ```
-
-## Usage
-
-1. Update the file paths in `main.py` to point to your CSV files:
-```python
-file_paths = {
-    'confluence_qa_v2_df': 'path/to/your/csv/file.csv',
-}
-```
-
-2. Configure dataset settings in `datasets/dataset_settings.py` if needed.
-
-3. Run the application:
-```bash
-python main.py
-```
-
-## Data Format
-
-The tool expects CSV files with the following columns:
-- prompt
-- response
-- context
-- keywords
-- category
-- references
-- conversation_date
-- source_platform
-
-## Configuration
-
-You can modify the following settings:
-- Workspace name and dataset name in `main.py`
-- Dataset field configurations in `datasets/dataset_settings.py`
-- Logging settings in `utils/logger.py`
 
 ## Error Handling
 
-The application includes comprehensive error handling and logging. Check the logs for any issues during execution.
+The library includes comprehensive error handling:
+- Connection validation
+- Workspace existence checks
+- Dataset creation validation
+- Record format validation
 
 ## Contributing
 

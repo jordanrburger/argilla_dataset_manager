@@ -116,6 +116,7 @@ class DatasetManager:
             )
             return dataset_obj.create()
             
+
         except Exception as e:
             if not isinstance(e, DatasetError):
                 e = DatasetError(f"Failed to create dataset '{dataset}': {str(e)}")
@@ -167,7 +168,7 @@ class DatasetManager:
             )
             
             # Get total record count
-            total_records = len(source)
+            total_records = len(source.records.to_list())
             logger.info(f"Found {total_records} records to migrate")
             
             # Migrate records in batches

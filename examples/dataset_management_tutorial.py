@@ -98,7 +98,7 @@ def tutorial():
     )
     argilla_settings = settings_manager.create_settings(updated_settings)
     
-    workspace = "my_workspace"  # Replace with your workspace
+    workspace = "keboola-slack-ft-model-comparison"  # Replace with your workspace
     dataset = "qa_dataset"      # Replace with your dataset
     
     print(f"Creating new version of {workspace}/{dataset}")

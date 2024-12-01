@@ -10,13 +10,15 @@ A Python-based tool for managing and uploading datasets to Argilla, specifically
 - Workspace management
 - Robust error handling and logging
 
-## Prerequisites
-
-- Python 3.x
-- Argilla server access
-- Required CSV data files
-
 ## Installation
+
+### From PyPI (Recommended)
+
+```bash
+pip install argilla-dataset-manager
+```
+
+### From Source
 
 1. Clone the repository:
 ```bash
@@ -24,12 +26,14 @@ git clone https://github.com/jordanrburger/argilla_dataset_manager.git
 cd argilla-dataset-manager
 ```
 
-2. Install dependencies:
+2. Install in development mode:
 ```bash
-pip install -r requirements.txt
+pip install -e .
 ```
 
-3. Create a `.env` file in the root directory with your Argilla credentials:
+## Configuration
+
+Create a `.env` file in your project directory with your Argilla credentials:
 ```env
 ARGILLA_API_URL=your_argilla_api_url
 ARGILLA_API_KEY=your_api_key
@@ -40,8 +44,7 @@ ARGILLA_API_KEY=your_api_key
 ### 1. Create a Text Classification Dataset
 
 ```python
-from utils import DatasetManager, get_argilla_client
-from datasets import SettingsManager
+from argilla_dataset_manager import DatasetManager, get_argilla_client, SettingsManager
 
 # Initialize
 client = get_argilla_client()
@@ -158,19 +161,58 @@ The `SettingsManager` provides several predefined templates:
    - Create datasets with custom fields
    - Flexible metadata configuration
 
+## Development
+
+### Setup Development Environment
+
+1. Clone the repository:
+```bash
+git clone https://github.com/jordanrburger/argilla_dataset_manager.git
+cd argilla-dataset-manager
+```
+
+2. Create a virtual environment:
+```bash
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+3. Install development dependencies:
+```bash
+pip install -e ".[dev]"
+```
+
+### Running Tests
+
+```bash
+pytest tests/
+```
+
+### Code Style
+
+This project uses:
+- Black for code formatting
+- isort for import sorting
+- mypy for type checking
+
+To format code:
+```bash
+black .
+isort .
+mypy .
+```
+
 ## Project Structure
 
 ```
-├── main.py                 # Main application entry point
-├── config.py              # Configuration settings
+argilla_dataset_manager/
+├── __init__.py            # Package initialization
 ├── utils/
 │   ├── argilla_client.py  # Argilla API interaction
 │   ├── dataset_manager.py # Dataset management
-│   ├── data_loader.py     # Data loading utilities
 │   └── logger.py          # Logging configuration
-├── datasets/
-│   └── settings_manager.py # Dataset settings and templates
-└── examples/              # Usage examples and tutorials
+└── datasets/
+    └── settings_manager.py # Dataset settings and templates
 ```
 
 ## Error Handling
@@ -183,28 +225,12 @@ The library includes comprehensive error handling:
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
-MIT License
-
-Copyright (c) 2023 Jordan Burger
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+MIT License - see the [LICENSE](LICENSE) file for details

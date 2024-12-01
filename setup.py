@@ -8,7 +8,7 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="argilla-dataset-manager",
-    version="0.1.1",
+    version="0.1.3",
     author="Jordan Burger",
     author_email="jordanrburger@gmail.com",
     description="A tool for managing and uploading datasets to Argilla",

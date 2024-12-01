@@ -179,4 +179,4 @@ class SettingsManager:
             "guidelines": guidelines,
             "fields": [rg.TextField(**field) for field in fields],
             "metadata_properties": metadata_properties or [],
-        }
+        } 

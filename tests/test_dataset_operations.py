@@ -2,21 +2,12 @@
 Test script for dataset management operations.
 """
 
-import json
 import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import argilla as rg
-
-# Add project root to Python path
-project_root = Path(__file__).parent.parent
-sys.path.append(str(project_root))
-
-from argilla_dataset_manager.datasets import SettingsManager, create_qa_dataset_settings
-from argilla_dataset_manager.utils import DatasetManager, get_argilla_client
 
 # Configure logging
 logging.basicConfig(
@@ -24,6 +15,10 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+from argilla_dataset_manager.datasets.settings_manager import SettingsManager
+from argilla_dataset_manager.utils.argilla_client import get_argilla_client
+from argilla_dataset_manager.utils.dataset_manager import DatasetManager
 
 # Use an existing workspace for testing
 TEST_WORKSPACE = "qa_workspace"  # This workspace exists in your Argilla instance

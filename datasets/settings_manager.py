@@ -2,9 +2,10 @@
 Settings management for Argilla datasets.
 """
 
-import argilla as rg
-from typing import List, Dict, Any, Optional
 from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional
+
+import argilla as rg
 
 
 @dataclass
@@ -21,6 +22,13 @@ class SettingsManager:
     """
     Manages dataset settings and provides templates for common dataset types.
     """
+
+    @staticmethod
+    def create_metadata_properties(
+        metadata_fields: List[str]
+    ) -> List[Dict[str, Any]]:
+        """Convert metadata field names to property configurations."""
+        return [{"name": field} for field in metadata_fields]
 
     @staticmethod
     def create_text_classification(
@@ -44,7 +52,7 @@ class SettingsManager:
             default_metadata = ["source", "date", "confidence"]
             if metadata_fields:
                 default_metadata.extend(metadata_fields)
-            settings["metadata_properties"] = [{"name": field} for field in default_metadata]
+            settings["metadata_properties"] = SettingsManager.create_metadata_properties(default_metadata)
 
         return settings
 

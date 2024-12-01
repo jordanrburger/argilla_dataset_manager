@@ -2,11 +2,12 @@
 Argilla client configuration and setup.
 """
 
+import logging
 import os
+from typing import Optional
+
 import argilla as rg
 from dotenv import load_dotenv
-import logging
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 

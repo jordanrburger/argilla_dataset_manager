@@ -1,19 +1,29 @@
+"""
+Logging configuration.
+"""
 import logging
+from typing import Any
 
-
-def setup_logger(name=__name__):
+def setup_logger(name: str = __name__, level: int = logging.INFO) -> logging.Logger:
+    """
+    Set up a logger with the specified name and level.
+    
+    Args:
+        name: Name for the logger
+        level: Logging level
+        
+    Returns:
+        Configured logger instance
+    """
     logger = logging.getLogger(name)
-    logger.setLevel(logging.INFO)
-
-    # Console handler
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-
-    # Formatter
-    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
-    ch.setFormatter(formatter)
-
-    # Add handlers
-    logger.addHandler(ch)
-
+    logger.setLevel(level)
+    
+    # Create console handler with formatting
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    
     return logger

@@ -1,59 +1,48 @@
-import re
-import json
+"""
+Data processing utilities.
+"""
+from typing import Dict, List, Any
 import pandas as pd
 
-
-def extract_json_objects(text):
+def process_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Extract JSON objects from text.
-
+    Process a DataFrame to prepare it for Argilla.
+    
     Args:
-        text (str): Text containing JSON objects.
-
+        df: Input DataFrame to process
+        
     Returns:
-        list: List of JSON objects.
+        Processed DataFrame
     """
-    try:
-        json_matches = re.finditer(r"\{.*?\}(?=\s|$)", text, re.DOTALL)
-        json_objects = []
-
-        for match in json_matches:
-            try:
-                json_obj = json.loads(match.group())
-                if (
-                    json_obj.get("prompt")
-                    == "How can we improve our documentation based on the questions and answers we have?"
-                ):
-                    continue
-                json_objects.append(json_obj)
-            except json.JSONDecodeError:
-                continue
-
-        return json_objects if json_objects else None
-    except Exception:
-        return None
-
-
-def process_dataframe(df):
-    """
-    Process DataFrame to extract and expand JSON data.
-
-    Args:
-        df (pd.DataFrame): Input DataFrame.
-
-    Returns:
-        pd.DataFrame: Processed DataFrame.
-    """
-    df["parsed_json"] = df["result_value"].apply(extract_json_objects)
-    df = df[df["parsed_json"].notna()]
-
-    # Flatten parsed_json and expand fields
-    records = []
-    for _, row in df.iterrows():
-        for json_obj in row["parsed_json"]:
-            record = row.to_dict()
-            record.update(json_obj)
-            records.append(record)
-
-    processed_df = pd.DataFrame(records)
+    # Add your processing logic here
+    processed_df = df.copy()
+    
+    # Clean text fields
+    text_columns = ['prompt', 'response', 'context', 'keywords']
+    for col in text_columns:
+        if col in processed_df.columns:
+            processed_df[col] = processed_df[col].fillna('')
+            processed_df[col] = processed_df[col].astype(str)
+            processed_df[col] = processed_df[col].str.strip()
+    
+    # Convert dates
+    if 'conversation_date' in processed_df.columns:
+        processed_df['conversation_date'] = pd.to_datetime(
+            processed_df['conversation_date']
+        ).dt.strftime('%Y-%m-%d')
+    
     return processed_df
+
+def clean_text_field(text: str) -> str:
+    """
+    Clean a text field by removing extra whitespace and normalizing.
+    
+    Args:
+        text: Input text to clean
+        
+    Returns:
+        Cleaned text
+    """
+    if pd.isna(text):
+        return ""
+    return str(text).strip()

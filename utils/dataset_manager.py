@@ -2,10 +2,11 @@
 Advanced dataset management functionality for Argilla.
 """
 
-import argilla as rg
-from typing import List, Dict, Any, Optional, Callable
-from datetime import datetime
 import logging
+from datetime import datetime
+from typing import Any, Callable, Dict, List, Optional
+
+import argilla as rg
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ class DatasetManager:
         self.client = client
         self._validate_client()
 
-    def _validate_client(self):
+    def _validate_client(self) -> None:
         """Validate that the client is properly configured."""
         try:
             self.client.http_client.get("/api/me")
@@ -121,75 +122,60 @@ class DatasetManager:
         target_dataset: str,
         new_settings: Dict[str, Any],
         transform_record: Optional[Callable] = None,
-        batch_size: int = 100,
-    ) -> rg.Dataset:
+        batch_size: int = 100
+    ) -> Dataset:
         """
         Migrate records from one dataset to another with new settings.
-
-        Args:
-            source_workspace: Name of the source workspace
-            source_dataset: Name of the source dataset
-            target_workspace: Name of the target workspace
-            target_dataset: Name of the target dataset
-            new_settings: New dataset settings
-            transform_record: Optional function to transform records
-            batch_size: Number of records to process in each batch
-
-        Returns:
-            rg.Dataset: The newly created dataset
-
-        Raises:
-            DatasetError: If migration fails
         """
         logger.info(
             f"Starting dataset migration from {source_workspace}/{source_dataset} "
             f"to {target_workspace}/{target_dataset}"
         )
-
+        
         try:
             # Get source dataset
-            source_ws = self._get_workspace(source_workspace, create=False)
-            source = self.client.datasets(name=source_dataset, workspace=source_ws)
-
+            source = self.client.datasets(name=source_dataset, workspace=source_workspace)
+            if source is None:
+                raise DatasetError(f"Source dataset '{source_dataset}' not found")
+            
             # Create target dataset
             target = self.create_dataset(
-                workspace=target_workspace, dataset=target_dataset, settings=new_settings
+                workspace=target_workspace,
+                dataset=target_dataset,
+                settings=new_settings
             )
-
-            # Get total record count
-            total_records = len(source.records.to_list())
+            
+            # Get records from source
+            records = source.records.list()
+            total_records = len(records)
             logger.info(f"Found {total_records} records to migrate")
-
-            # Migrate records in batches
-            offset = 0
-            with tqdm(total=total_records, desc="Migrating records") as pbar:
-                while offset < total_records:
-                    # Get batch of records
-                    records = source[offset : offset + batch_size]
-                    if not records:
-                        break
-
-                    # Transform records if needed
-                    if transform_record:
-                        try:
-                            records = [transform_record(record) for record in records]
-                        except Exception as e:
-                            raise DatasetError(
-                                f"Record transformation failed at offset {offset}: {str(e)}"
-                            )
-
-                    # Log records to new dataset
+            
+            # Process records in batches
+            for i in range(0, total_records, batch_size):
+                batch = records[i:i + batch_size]
+                
+                # Transform records if needed
+                if transform_record:
                     try:
-                        target.add_records(records)
+                        batch = [transform_record(record) for record in batch]
                     except Exception as e:
-                        raise DatasetError(f"Failed to add records at offset {offset}: {str(e)}")
-
-                    offset += len(records)
-                    pbar.update(len(records))
-
+                        raise DatasetError(
+                            f"Record transformation failed at offset {i}: {str(e)}"
+                        )
+                
+                # Log records to new dataset
+                try:
+                    target.add_records(batch)
+                except Exception as e:
+                    raise DatasetError(
+                        f"Failed to add records at offset {i}: {str(e)}"
+                    )
+                
+                logger.info(f"Migrated {i + len(batch)} of {total_records} records")
+            
             logger.info("Migration completed successfully")
             return target
-
+            
         except Exception as e:
             if not isinstance(e, DatasetError):
                 e = DatasetError(f"Migration failed: {str(e)}")

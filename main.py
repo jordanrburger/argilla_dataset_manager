@@ -1,15 +1,16 @@
+import argilla as rg
+
 from config import Config
-from utils.logger import setup_logger
-from utils.data_loader import load_csv_files
-from utils.data_processor import process_dataframe
+from my_datasets.dataset_settings import get_dataset_settings
 from utils.argilla_client import (
     get_argilla_client,
-    get_or_create_workspace,
     get_or_create_dataset,
+    get_or_create_workspace,
     log_records_to_dataset,
 )
-from my_datasets.dataset_settings import get_dataset_settings
-import argilla as rg
+from utils.data_loader import load_csv_files
+from utils.data_processor import process_dataframe
+from utils.logger import setup_logger
 
 
 def main():

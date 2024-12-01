@@ -4,5 +4,6 @@ include requirements.txt
 include pyproject.toml
 recursive-include argilla_dataset_manager *.py
 recursive-include argilla_dataset_manager py.typed
+recursive-include stubs *.pyi
 recursive-include examples *.py
 recursive-include tests *.py 

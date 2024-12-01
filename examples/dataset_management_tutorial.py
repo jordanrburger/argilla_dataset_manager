@@ -20,8 +20,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.append(str(project_root))
 
-from utils import DatasetManager, get_argilla_client
 from my_datasets import SettingsManager, create_qa_dataset_settings
+from utils import DatasetManager, get_argilla_client
 
 
 def tutorial():

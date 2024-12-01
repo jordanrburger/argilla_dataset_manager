@@ -23,6 +23,7 @@ sys.path.append(str(project_root))
 from utils import DatasetManager, get_argilla_client
 from my_datasets import SettingsManager, create_qa_dataset_settings
 
+
 def tutorial():
     """
     Run through the dataset management tutorial step by step.
@@ -40,11 +41,9 @@ def tutorial():
     print("-----------------------------------------")
     # Create a new dataset configuration with context and keywords
     qa_settings = create_qa_dataset_settings(
-        name="enhanced_qa_dataset",
-        include_context=True,
-        include_keywords=True
+        name="enhanced_qa_dataset", include_context=True, include_keywords=True
     )
-    
+
     # Save the configuration for later use
     config_path = settings_manager.save_settings(qa_settings, "enhanced_qa_config")
     print(f"✓ Configuration saved to: {config_path}")
@@ -54,19 +53,19 @@ def tutorial():
     print("Step 3: Migrate Dataset with New Settings")
     print("-------------------------------------")
     print("This step will migrate an existing dataset to a new one with enhanced settings")
-    
+
     # Convert our settings to Argilla format
     argilla_settings = settings_manager.create_settings(qa_settings)
-    
+
     # Migrate the dataset
     source_workspace = "qa_workspace"  # Replace with your source workspace
-    source_dataset = "initial_qa_dataset"      # Replace with your source dataset
+    source_dataset = "initial_qa_dataset"  # Replace with your source dataset
     target_workspace = "keboola-slack-ft-model-comparison"  # Replace with your target workspace
-    target_dataset = "enhanced_dataset" # Replace with your desired target name
-    
+    target_dataset = "enhanced_dataset"  # Replace with your desired target name
+
     print(f"Migrating dataset from {source_workspace}/{source_dataset}")
     print(f"to {target_workspace}/{target_dataset}")
-    
+
     new_dataset = dataset_manager.migrate_dataset(
         source_workspace=source_workspace,
         source_dataset=source_dataset,
@@ -76,8 +75,8 @@ def tutorial():
         # Optional: Transform records during migration
         transform_record=lambda record: {
             **record.fields,
-            "keywords": record.fields.get("keywords", "").split(",")
-        }
+            "keywords": record.fields.get("keywords", "").split(","),
+        },
     )
     print("✓ Migration completed")
     print("→ Check Argilla UI now to see:")
@@ -89,25 +88,20 @@ def tutorial():
     print("Step 4: Create a New Dataset Version")
     print("--------------------------------")
     print("This step will create a new version of a dataset with updated settings")
-    
+
     # Create updated settings
     updated_settings = create_qa_dataset_settings(
-        name="qa_dataset_v2",
-        include_context=True,
-        include_keywords=True
+        name="qa_dataset_v2", include_context=True, include_keywords=True
     )
     argilla_settings = settings_manager.create_settings(updated_settings)
-    
+
     workspace = "keboola-slack-ft-model-comparison"  # Replace with your workspace
-    dataset = "qa_dataset"      # Replace with your dataset
-    
+    dataset = "qa_dataset"  # Replace with your dataset
+
     print(f"Creating new version of {workspace}/{dataset}")
-    
+
     new_version = dataset_manager.update_dataset_settings(
-        workspace=workspace,
-        dataset=dataset,
-        new_settings=argilla_settings,
-        create_new_version=True
+        workspace=workspace, dataset=dataset, new_settings=argilla_settings, create_new_version=True
     )
     print("✓ New version created")
     print("→ Check Argilla UI now to see:")
@@ -119,19 +113,19 @@ def tutorial():
     print("Step 5: Clone Dataset to New Workspace")
     print("----------------------------------")
     print("This step will clone a dataset to a different workspace")
-    
+
     source_workspace = "qa_workspace"  # Replace with source workspace
-    source_dataset = "qa_dataset"      # Replace with source dataset
+    source_dataset = "qa_dataset"  # Replace with source dataset
     target_workspace = "target_workspace"  # Replace with target workspace
-    
+
     print(f"Cloning {source_workspace}/{source_dataset}")
     print(f"to {target_workspace}/cloned_dataset")
-    
+
     cloned_dataset = dataset_manager.clone_dataset(
         workspace=source_workspace,
         dataset=source_dataset,
         new_name="cloned_dataset",
-        new_workspace=target_workspace
+        new_workspace=target_workspace,
     )
     print("✓ Dataset cloned successfully")
     print("→ Check Argilla UI now to see:")
@@ -147,5 +141,6 @@ def tutorial():
     print("3. Implement data transformation during migrations")
     print("4. Manage multiple dataset versions across workspaces")
 
+
 if __name__ == "__main__":
-    tutorial() 
+    tutorial()

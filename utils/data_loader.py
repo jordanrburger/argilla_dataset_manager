@@ -1,5 +1,6 @@
 import pandas as pd
 
+
 def load_csv_files(file_paths):
     """
     Load multiple CSV files into a dictionary of DataFrames.

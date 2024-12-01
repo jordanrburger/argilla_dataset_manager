@@ -34,4 +34,4 @@ setup(
     package_data={
         "argilla_dataset_manager": ["py.typed"],
     },
-) 
+)

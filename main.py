@@ -11,20 +11,21 @@ from utils.argilla_client import (
 from my_datasets.dataset_settings import get_dataset_settings
 import argilla as rg
 
+
 def main():
     logger = setup_logger()
 
     # Load Data
     logger.info("Loading data...")
     file_paths = {
-        'confluence_qa_v2_df': 'path/to/confluence_qa_v2.csv',
+        "confluence_qa_v2_df": "path/to/confluence_qa_v2.csv",
         # Add other files as needed
     }
     dataframes = load_csv_files(file_paths)
 
     # Process Data
     logger.info("Processing data...")
-    processed_df = process_dataframe(dataframes['confluence_qa_v2_df'])
+    processed_df = process_dataframe(dataframes["confluence_qa_v2_df"])
 
     # Initialize Argilla client
     logger.info("Initializing Argilla client...")
@@ -53,7 +54,7 @@ def main():
             metadata={
                 "conversation_date": row.get("conversation_date", "").strip(),
                 "source_platform": row.get("source_platform", "").strip(),
-            }
+            },
         )
         records.append(record)
 
@@ -61,6 +62,7 @@ def main():
     logger.info(f"Logging {len(records)} records to the dataset...")
     log_records_to_dataset(dataset, records)
     logger.info("Data upload completed successfully.")
+
 
 if __name__ == "__main__":
     main()

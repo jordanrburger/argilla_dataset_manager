@@ -36,6 +36,55 @@ class DatasetManager:
         except Exception as e:
             raise DatasetError(f"Invalid Argilla client configuration: {str(e)}")
 
+    def list_workspaces(self) -> List[rg.Workspace]:
+        """
+        List all available workspaces.
+
+        Returns:
+            List[rg.Workspace]: List of workspace objects
+
+        Raises:
+            DatasetError: If workspace listing fails
+        """
+        try:
+            workspaces = self.client.workspaces()
+            logger.info(f"Found {len(workspaces)} workspaces")
+            for ws in workspaces:
+                logger.info(f"Workspace: {ws.name}")
+            return workspaces
+        except Exception as e:
+            raise DatasetError(f"Failed to list workspaces: {str(e)}")
+
+    def list_datasets(self, workspace: str) -> List[rg.Dataset]:
+        """
+        List all datasets in a workspace.
+
+        Args:
+            workspace: Workspace name
+
+        Returns:
+            List[rg.Dataset]: List of dataset objects
+
+        Raises:
+            DatasetError: If dataset listing fails
+        """
+        try:
+            ws = self._get_workspace(workspace, create=False)
+            datasets = ws.datasets
+            logger.info(f"Found {len(datasets)} datasets in workspace '{workspace}'")
+            for ds in datasets:
+                logger.info(
+                    f"Dataset: {ds.name}\n"
+                    f"  - Records: {len(ds.records)}\n"
+                    f"  - Created: {ds.created_at}\n"
+                    f"  - Last updated: {ds.last_updated}"
+                )
+            return datasets
+        except Exception as e:
+            if not isinstance(e, DatasetError):
+                e = DatasetError(f"Failed to list datasets in workspace '{workspace}': {str(e)}")
+            raise e
+
     def _get_workspace(self, workspace: str, create: bool = True) -> rg.Workspace:
         """
         Get or create a workspace.

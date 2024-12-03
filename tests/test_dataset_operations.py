@@ -16,7 +16,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-from argilla_dataset_manager.datasets.settings_manager import SettingsManager
+from argilla_dataset_manager.datasets.settings_manager import DatasetTemplate, SettingsManager
 from argilla_dataset_manager.utils.argilla_client import get_argilla_client
 from argilla_dataset_manager.utils.dataset_manager import DatasetManager
 
@@ -38,15 +38,16 @@ def test_dataset_creation(client: rg.Argilla) -> rg.Dataset:
     try:
         # Initialize managers
         dataset_manager = DatasetManager(client)
+        settings_manager = SettingsManager()
         
         # Create test settings
         test_name = f"test_dataset_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         
-        # Basic settings for text classification
-        settings = {
-            "guidelines": "Test dataset for QA classification",
-            "labels": ["question", "answer", "other"]
-        }
+        # Create dataset settings using SettingsManager
+        settings = settings_manager.create_text_classification(
+            labels=["question", "answer", "other"],
+            guidelines="Test dataset for QA classification"
+        )
         
         # Create dataset
         dataset = dataset_manager.create_dataset(

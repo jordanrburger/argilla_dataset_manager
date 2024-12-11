@@ -19,7 +19,7 @@ class DatasetError(Exception):
 
 
 class DatasetManager:
-    def __init__(self, client: rg.Argilla):
+    def __init__(self, client: rg.init):
         """
         Initialize the dataset manager.
 
@@ -100,19 +100,21 @@ class DatasetManager:
             DatasetError: If workspace cannot be accessed or created
         """
         try:
-            # First try to get the workspace
-            try:
-                workspace_obj = self.client.get_workspace(workspace)
-                logger.info(f"Found existing workspace: {workspace}")
-                return workspace_obj
-            except Exception:
-                if not create:
-                    raise DatasetError(f"Workspace '{workspace}' not found")
-                
-                # If not found and create is True, create it
-                logger.info(f"Creating new workspace: {workspace}")
-                workspace_obj = rg.Workspace(name=workspace)
-                return workspace_obj.create()
+            # Try to find the workspace in the list of workspaces
+            workspaces = list(self.client.workspaces)  # Convert to list to avoid potential iterator issues
+            for ws in workspaces:
+                if ws.name == workspace:
+                    logger.info(f"Found existing workspace: {workspace}")
+                    return ws
+            
+            # If we get here, workspace was not found
+            if not create:
+                raise DatasetError(f"Workspace '{workspace}' not found")
+            
+            # If not found and create is True, create it
+            logger.info(f"Creating new workspace: {workspace}")
+            workspace_obj = rg.Workspace(name=workspace, client=self.client)
+            return workspace_obj.create()
 
         except Exception as e:
             if not isinstance(e, DatasetError):

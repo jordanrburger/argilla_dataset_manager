@@ -1,62 +1,39 @@
 # Argilla Dataset Manager
 
-A Python-based tool for managing and uploading datasets to Argilla, specifically designed for handling various types of text datasets with advanced configuration options.
-
-## Features
-
-- Easy dataset creation with predefined templates
-- Flexible dataset configuration for different use cases
-- Dataset migration and versioning
-- Workspace management
-- Robust error handling and logging
+A Python package for managing and uploading datasets to Argilla, providing a streamlined interface for dataset creation, configuration, and management.
 
 ## Installation
-
-### From PyPI (Recommended)
 
 ```bash
 pip install argilla-dataset-manager
 ```
 
-### From Source
+## Features
 
-1. Clone the repository:
-```bash
-git clone https://github.com/jordanrburger/argilla_dataset_manager.git
-cd argilla-dataset-manager
-```
-
-2. Install in development mode:
-```bash
-pip install -e .
-```
-
-## Configuration
-
-Create a `.env` file in your project directory with your Argilla credentials:
-```env
-ARGILLA_API_URL=your_argilla_api_url
-ARGILLA_API_KEY=your_api_key
-```
+- Easy dataset creation and configuration
+- Predefined templates for common dataset types
+- Flexible settings management
+- Built-in support for various data formats
+- Type-safe implementation with mypy support
 
 ## Quick Start
 
-### 1. Create a Text Classification Dataset
-
 ```python
-from argilla_dataset_manager import DatasetManager, get_argilla_client, SettingsManager
+from argilla_dataset_manager.datasets import SettingsManager
+from argilla_dataset_manager.utils import DatasetManager, get_argilla_client
 
-# Initialize
+# Initialize Argilla client
 client = get_argilla_client()
+
+# Create dataset managers
 dataset_manager = DatasetManager(client)
 settings_manager = SettingsManager()
 
-# Create settings for text classification
+# Create dataset settings
 settings = settings_manager.create_text_classification(
-    labels=['positive', 'negative', 'neutral'],
-    guidelines="Sentiment analysis dataset",
-    include_metadata=True,
-    metadata_fields=['source', 'confidence']
+    labels=["positive", "negative", "neutral"],
+    guidelines="Classify the sentiment of the text",
+    include_metadata=True
 )
 
 # Create dataset
@@ -65,110 +42,80 @@ dataset = dataset_manager.create_dataset(
     dataset="sentiment_analysis",
     settings=settings
 )
-
-# Add records
-record = rg.Record(
-    fields={
-        "text": "This product is amazing!"
-    },
-    metadata={
-        "source": "reviews",
-        "confidence": 0.95
-    }
-)
-dataset.records.log([record])
 ```
 
-### 2. Create a Q&A Dataset
+## Package Structure
 
+```
+argilla_dataset_manager/
+├── datasets/
+│   ├── __init__.py
+│   └── settings_manager.py      # Dataset settings and templates
+├── utils/
+│   ├── __init__.py
+│   ├── argilla_client.py       # Argilla client configuration
+│   ├── dataset_manager.py      # Dataset operations
+│   ├── data_loader.py         # Data loading utilities
+│   ├── data_processor.py      # Data processing utilities
+│   └── logger.py              # Logging configuration
+└── __init__.py
+```
+
+## Dataset Settings
+
+The package provides several predefined dataset templates:
+
+### Text Classification
 ```python
-# Create settings for Q&A dataset
+settings = settings_manager.create_text_classification(
+    labels=["label1", "label2"],
+    guidelines="Classification guidelines",
+    include_metadata=True
+)
+```
+
+### Question-Answer
+```python
 settings = settings_manager.create_qa_dataset(
     include_context=True,
     include_keywords=True,
-    include_references=True,
-    guidelines="Customer support Q&A dataset"
+    guidelines="QA dataset guidelines"
 )
-
-# Create dataset
-dataset = dataset_manager.create_dataset(
-    workspace="support_workspace",
-    dataset="customer_qa",
-    settings=settings
-)
-
-# Add a Q&A record
-record = rg.Record(
-    fields={
-        "question": "How do I reset my password?",
-        "answer": "Click on 'Forgot Password' and follow the instructions.",
-        "context": "User authentication flow",
-        "keywords": "password,reset,auth",
-        "references": "docs/auth.md"
-    },
-    metadata={
-        "source": "support_tickets",
-        "date": "2023-12-01"
-    }
-)
-dataset.records.log([record])
 ```
 
-### 3. Dataset Migration and Versioning
-
+### Text Generation
 ```python
-# Create new version of existing dataset with updated settings
-new_version = dataset_manager.update_dataset_settings(
-    workspace="my_workspace",
-    dataset="customer_qa",
-    new_settings=updated_settings,
-    create_new_version=True
-)
-
-# Clone dataset to different workspace
-cloned_dataset = dataset_manager.clone_dataset(
-    workspace="development",
-    dataset="customer_qa",
-    new_name="customer_qa_prod",
-    new_workspace="production"
+settings = settings_manager.create_text_generation(
+    include_prompt_template=True,
+    include_context=True,
+    guidelines="Text generation guidelines"
 )
 ```
 
-## Available Dataset Templates
+### Text Summarization
+```python
+settings = settings_manager.create_text_summarization(
+    include_metadata=True,
+    include_keywords=True,
+    guidelines="Text summarization guidelines"
+)
+```
 
-The `SettingsManager` provides several predefined templates:
+## Environment Variables
 
-1. **Text Classification**
-   - Basic text classification with customizable labels
-   - Optional metadata fields
-
-2. **Q&A Datasets**
-   - Question and answer fields
-   - Optional context, keywords, and references
-   - Configurable metadata
-
-3. **Text Generation**
-   - Prompt and response fields
-   - Optional prompt templates
-   - Model-specific metadata
-
-4. **Text Summarization**
-   - Text and summary fields
-   - Length and compression ratio tracking
-   - Source tracking
-
-5. **Custom Datasets**
-   - Create datasets with custom fields
-   - Flexible metadata configuration
+Required environment variables:
+```
+ARGILLA_API_URL=your_argilla_instance_url
+ARGILLA_API_KEY=your_api_key
+HF_TOKEN=your_huggingface_token  # Optional, for private spaces
+```
 
 ## Development
-
-### Setup Development Environment
 
 1. Clone the repository:
 ```bash
 git clone https://github.com/jordanrburger/argilla_dataset_manager.git
-cd argilla-dataset-manager
+cd argilla_dataset_manager
 ```
 
 2. Create a virtual environment:
@@ -182,55 +129,15 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e ".[dev]"
 ```
 
-### Running Tests
-
+4. Run tests:
 ```bash
 pytest tests/
 ```
 
-### Code Style
+## License
 
-This project uses:
-- Black for code formatting
-- isort for import sorting
-- mypy for type checking
-
-To format code:
-```bash
-black .
-isort .
-mypy .
-```
-
-## Project Structure
-
-```
-argilla_dataset_manager/
-├── __init__.py            # Package initialization
-├── utils/
-│   ├── argilla_client.py  # Argilla API interaction
-│   ├── dataset_manager.py # Dataset management
-│   └── logger.py          # Logging configuration
-└── datasets/
-    └── settings_manager.py # Dataset settings and templates
-```
-
-## Error Handling
-
-The library includes comprehensive error handling:
-- Connection validation
-- Workspace existence checks
-- Dataset creation validation
-- Record format validation
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-MIT License - see the [LICENSE](LICENSE) file for details
+Contributions are welcome! Please feel free to submit a Pull Request.

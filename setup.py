@@ -8,14 +8,14 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="argilla-dataset-manager",
-    version="0.1.6",
+    version="0.1.7",
     author="Jordan Burger",
     author_email="jordanrburger@gmail.com",
     description="A tool for managing and uploading datasets to Argilla",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/jordanrburger/argilla_dataset_manager",
-    packages=find_packages(include=["argilla_dataset_manager*"]),
+    packages=find_packages(),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
@@ -32,6 +32,8 @@ setup(
     install_requires=requirements,
     include_package_data=True,
     package_data={
-        "argilla_dataset_manager": ["py.typed", "**/*.py", "**/*.pyi"],
+        "argilla_dataset_manager": ["py.typed"],
+        "argilla_dataset_manager.utils": ["*.py"],
+        "argilla_dataset_manager.datasets": ["*.py"],
     },
 )

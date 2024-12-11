@@ -47,7 +47,7 @@ class DatasetManager:
             DatasetError: If workspace listing fails
         """
         try:
-            workspaces = self.client.workspaces()
+            workspaces = list(self.client.workspaces)
             logger.info(f"Found {len(workspaces)} workspaces")
             for ws in workspaces:
                 logger.info(f"Workspace: {ws.name}")
@@ -101,18 +101,18 @@ class DatasetManager:
         """
         try:
             # First try to get the workspace
-            workspace_obj = self.client.workspaces(workspace)
-            if workspace_obj is not None:
+            try:
+                workspace_obj = self.client.get_workspace(workspace)
                 logger.info(f"Found existing workspace: {workspace}")
                 return workspace_obj
-
-            # If not found and create is True, create it
-            if create:
+            except Exception:
+                if not create:
+                    raise DatasetError(f"Workspace '{workspace}' not found")
+                
+                # If not found and create is True, create it
                 logger.info(f"Creating new workspace: {workspace}")
-                workspace_obj = rg.Workspace(name=workspace, client=self.client)
+                workspace_obj = rg.Workspace(name=workspace)
                 return workspace_obj.create()
-
-            raise DatasetError(f"Workspace '{workspace}' not found")
 
         except Exception as e:
             if not isinstance(e, DatasetError):
@@ -172,7 +172,7 @@ class DatasetManager:
         new_settings: Dict[str, Any],
         transform_record: Optional[Callable] = None,
         batch_size: int = 100
-    ) -> Dataset:
+    ) -> rg.Dataset:
         """
         Migrate records from one dataset to another with new settings.
         """
